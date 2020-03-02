@@ -7,9 +7,7 @@ def univariate_analysis_applying(data):
                           "Patients EEG categories distribution (numeric)",
                           "univariate_analysis")
 
-    data = data / data.values.sum() * 100
-
-    plotting.pie_plotting(data,
+    plotting.pie_plotting(data / data.values.sum() * 100,
                           "Patients EEG categories distribution (percentage)",
                           "univariate_analysis")
 
