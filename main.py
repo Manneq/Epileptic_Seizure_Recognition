@@ -1,24 +1,15 @@
-import data_import
-import plotting
-
-
-def univariate_analysis_applying(data):
-    plotting.bar_plotting(data, ["Categories", "Patients number"],
-                          "Patients EEG categories distribution (numeric)",
-                          "univariate_analysis")
-
-    plotting.pie_plotting(data / data.values.sum() * 100,
-                          "Patients EEG categories distribution (percentage)",
-                          "univariate_analysis")
-
-    return
+import data_management
+import univariate_analysis
+import multivariate_analysis
 
 
 def main():
-    data = data_import.data_loading()
+    data = data_management.data_loading()
 
-    univariate_analysis_applying(
+    univariate_analysis.univariate_analysis_applying(
         data[['categories']].groupby('categories').size())
+
+    multivariate_analysis.multivariate_analysis_applying(data)
 
     return
 
