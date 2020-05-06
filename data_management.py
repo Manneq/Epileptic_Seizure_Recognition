@@ -1,4 +1,5 @@
 import pandas as pd
+import sklearn.preprocessing
 import sklearn.model_selection
 import numpy as np
 
@@ -36,17 +37,35 @@ def dimensionality_reduction(data, reduction_type):
 
     return pd.DataFrame(np.append(reduction_model.fit_transform(
         data.iloc[:, 0:178]), data.iloc[:, 178:180].values, axis=1),
-        columns=['x1', 'x2', 'y', 'categories'])
+        columns=['x1', 'x2', 'y', 'categories'], index=data.index)
 
 
-def categories_preprocessing(data):
-    return
+def data_normalization(data):
+    scaler_model = sklearn.preprocessing.MinMaxScaler()
+
+    return pd.DataFrame(np.append(scaler_model.fit_transform(
+        data.iloc[:, 0:178]), data.iloc[:, 178:180].values, axis=1),
+        columns=data.columns, index=data.index)
 
 
-def sets_creation(data_input, data_output):
+def data_preprocessing(data):
+    model_binarizer = sklearn.preprocessing.LabelBinarizer()
+
+    data = data.drop(columns=['y'], axis=1)
+    data[['y1', 'y2', 'y3', 'y5', 'y6']] = \
+        pd.DataFrame(model_binarizer.fit_transform(data.iloc[:, 178]),
+                     index=data.index)
+
+    return data
+
+
+def sets_creation(data):
+    data = data_preprocessing(data)
+
     training_set_input, validation_set_input, training_set_output, \
         validation_set_output = \
-        sklearn.model_selection.train_test_split(data_input, data_output,
+        sklearn.model_selection.train_test_split(data.iloc[:, 0:178],
+                                                 data.iloc[:, 178:184],
                                                  test_size=0.2)
 
     return (training_set_input, training_set_output), \

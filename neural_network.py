@@ -1,4 +1,5 @@
 import keras
+import numpy as np
 
 
 def model_training(model, training_set, validation_set,
@@ -13,43 +14,45 @@ def model_training(model, training_set, validation_set,
               callbacks=[keras.callbacks.TerminateOnNaN(),
                          keras.callbacks.EarlyStopping(
                              monitor='val_acc',
-                             min_delta=1e-4,
+                             min_delta=1e-5,
                              patience=5,
                              restore_best_weights=True),
                          keras.callbacks.ReduceLROnPlateau(),
                          keras.callbacks.TensorBoard(
-                             log_dir="data/output/neural_network/logs",
+                             log_dir="output_data/multivariate_analysis/"
+                                     "initial/neural_network/logs",
                              batch_size=batch_size,
                              write_grads=True,
                              write_images=True)])
+
+    model.save_weights("output_data/multivariate_analysis/initial/"
+                       "neural_network/weights/weights.h5")
 
     return model
 
 
 def model_evaluation(model, validation_set,
                      batch_size=512):
-    print("Metrics results: ", model.metrics_names)
-    print(model.evaluate(x=validation_set[0],
-                         y=validation_set[1],
-                         batch_size=batch_size))
+    metrics = model.evaluate(x=validation_set[0],
+                             y=validation_set[1],
+                             batch_size=batch_size)
 
-    model.save_weights("data/output/neural_network/weights/weights.h5")
-
-    return
+    return metrics[1]
 
 
-def model_creation_and_compiling(input_dimension):
+def model_creation_and_compiling():
     model = keras.Sequential()
 
-    model.add(keras.layers.Dense(1024, input_dim=input_dimension,
-                                 activation='sigmoid'))
-    model.add(keras.layers.Dense(512, activation='sigmoid'))
-    model.add(keras.layers.Dense(256, activation='sigmoid'))
-    model.add(keras.layers.Dense(128, activation='sigmoid'))
-    model.add(keras.layers.Dense(64, activation='sigmoid'))
-    model.add(keras.layers.Dense(32, activation='sigmoid'))
-    model.add(keras.layers.Dense(16, activation='sigmoid'))
-    model.add(keras.layers.Dense(8, activation='sigmoid'))
+    model.add(keras.layers.Dense(4096, input_dim=178,
+                                 activation='relu'))
+    model.add(keras.layers.Dense(2048, activation='relu'))
+    model.add(keras.layers.Dense(1024, activation='relu'))
+    model.add(keras.layers.Dense(512, activation='relu'))
+    model.add(keras.layers.Dense(256, activation='relu'))
+    model.add(keras.layers.Dense(128, activation='relu'))
+    model.add(keras.layers.Dense(64, activation='relu'))
+    model.add(keras.layers.Dense(32, activation='relu'))
+    model.add(keras.layers.Dense(16, activation='relu'))
     model.add(keras.layers.Dense(5, activation='softmax'))
 
     model.compile(loss='categorical_crossentropy', optimizer='adam',
@@ -60,13 +63,20 @@ def model_creation_and_compiling(input_dimension):
 
 def neural_network_model(training_set, validation_set,
                          training=True):
-    model = model_creation_and_compiling(training_set[0].shape[0])
+    model = model_creation_and_compiling()
+
+    training_set = (training_set[0],
+                    training_set[1].drop(columns=['categories'], axis=1))
+    validation_set_temp = (validation_set[0],
+                           validation_set[1].drop(columns=['categories'],
+                                                  axis=1))
 
     if training:
-        model = model_training(model, training_set, validation_set)
-        model_evaluation(model, validation_set)
+        model = model_training(model, training_set, validation_set_temp)
+        model_evaluation(model, validation_set_temp)
     else:
-        model.load_weights("data/output/neural_network/weights/weights.h5")
-        model_evaluation(model, validation_set)
+        model.load_weights("output_data/multivariate_analysis/initial/"
+                           "neural_network/weights/weights.h5")
+        model_evaluation(model, validation_set_temp)
 
     return
