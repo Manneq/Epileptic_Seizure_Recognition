@@ -45,13 +45,12 @@ def reduced_data_analysis(data,
 def multivariate_analysis_applying(data):
     initial_data_analysis(data)
 
-    """
     reduced_data_analysis(data)
 
     reduced_data_analysis(data, reduction_type="FA")
 
     reduced_data_analysis(data, reduction_type="MDS")
 
-    reduced_data_analysis(data, reduction_type="TSNE")"""
+    reduced_data_analysis(data, reduction_type="TSNE")
 
     return
