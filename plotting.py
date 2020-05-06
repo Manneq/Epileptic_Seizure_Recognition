@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-def bar_plotting(data, labels, title, folder,
+def bar_plotting(data, labels, title,
                  width=1920, height=1080, dpi=96, font_size=22, color='b'):
     plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
     plt.rcParams.update({'font.size': font_size})
@@ -14,13 +14,13 @@ def bar_plotting(data, labels, title, folder,
     plt.xticks(np.arange(len(data)), data.index)
     plt.title(title)
     plt.tight_layout()
-    plt.savefig("plots/" + folder + "/" + title + ".png", dpi=dpi)
+    plt.savefig("output_data/univariate_analysis/" + title + ".png", dpi=dpi)
     plt.close()
 
     return
 
 
-def pie_plotting(data, title, folder,
+def pie_plotting(data, title,
                  width=1920, height=1080, dpi=96, font_size=22):
     explode = ()
 
@@ -34,7 +34,7 @@ def pie_plotting(data, title, folder,
     plt.axis('equal')
     plt.title(title)
     plt.tight_layout()
-    plt.savefig("plots/" + folder + "/" + title + ".png", dpi=dpi)
+    plt.savefig("output_data/univariate_analysis/" + title + ".png", dpi=dpi)
     plt.close()
 
     return
@@ -46,7 +46,8 @@ def heatmap_plotting(data, title, folder,
     plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
     plt.rcParams.update({'font.size': font_size})
     sns.heatmap(data, annot=annotation).set_title(title)
-    plt.savefig("plots/" + folder + "/" + title + ".png", dpi=dpi)
+    plt.savefig("output_data/multivariate_analysis/" + folder + "/" +
+                title + ".png", dpi=dpi)
     plt.close()
 
     return
@@ -71,7 +72,24 @@ def data_plotting(data, labels, title, folder,
     plt.ylabel(labels[1])
     plt.title(title)
     plt.tight_layout()
-    plt.savefig("plots/" + folder + "/" + title + ".png", dpi=dpi)
+    plt.savefig("output_data/multivariate_analysis/" +
+                folder + "/" + title + ".png", dpi=dpi)
+    plt.close()
+
+    return
+
+
+def histogram_plotting(data, labels, title,
+                       width=1920, height=1080, dpi=96, font_size=22):
+    plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
+    plt.rcParams.update({'font.size': font_size})
+    plt.hist(data, bins=data.shape[0])
+    plt.xlabel(labels[0])
+    plt.ylabel(labels[1])
+    plt.title(title)
+    plt.tight_layout()
+    plt.savefig("output_data/multivariate_analysis/initial/" +
+                title + ".png", dpi=dpi)
     plt.close()
 
     return
