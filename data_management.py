@@ -1,5 +1,6 @@
 import pandas as pd
 import sklearn.preprocessing
+import sklearn.decomposition
 import sklearn.model_selection
 import numpy as np
 

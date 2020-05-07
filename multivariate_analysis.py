@@ -4,21 +4,35 @@ import plotting
 import neural_network
 
 
+def standard_deviation_computing(data,
+                                 data_type="Initial"):
+    plotting.histogram_plotting(np.std(data, axis=0),
+                                ["Parameters", "Standard deviation"],
+                                data_type + " data standard deviations")
+
+    for category in np.unique(data[['categories']].values):
+        plotting.histogram_plotting(np.std(data.loc[
+                                               data['categories'] == category],
+                                           axis=0),
+                                    ["Parameters", "Standard deviation"],
+                                    data_type +
+                                    " data standard deviations (" +
+                                    category + ")")
+
+    return
+
+
 def initial_data_analysis(data):
     plotting.heatmap_plotting(data.iloc[:, 0:178].corr(),
                               "Brain activity correlations",
                               "initial", width=3000, height=3000,
                               annotation=False)
 
-    plotting.histogram_plotting(np.std(data, axis=0),
-                                ["Parameters", "Standard deviation"],
-                                "Initial data standard deviations")
+    standard_deviation_computing(data)
 
     data = data_management.data_normalization(data)
 
-    plotting.histogram_plotting(np.std(data, axis=0),
-                                ["Parameters", "Standard deviation"],
-                                "Normalized data standard deviations")
+    standard_deviation_computing(data, data_type="Normalized")
 
     training_set, validation_set = data_management.sets_creation(data)
 
