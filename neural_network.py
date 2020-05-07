@@ -1,9 +1,23 @@
+"""
+    File 'neural_network.py' used for creating, training and evaluating
+        neural network.
+"""
 import keras
-import numpy as np
 
 
 def model_training(model, training_set, validation_set,
                    batch_size=512, epochs=100):
+    """
+        Method for neural network training.
+        param:
+            1. model - Keras neural network model
+            2. training_set - tuple of sets for training
+            3. validation_set - tuple of sets for validation
+            4. batch_size - batch size for training (512 as default)
+            5. epochs - number of epochs (100 as default)
+        return:
+            model - Keras neural network model
+    """
     model.fit(x=training_set[0],
               y=training_set[1],
               batch_size=batch_size,
@@ -25,6 +39,7 @@ def model_training(model, training_set, validation_set,
                              write_grads=True,
                              write_images=True)])
 
+    # Weights saving
     model.save_weights("output_data/multivariate_analysis/initial/"
                        "neural_network/weights/weights.h5")
 
@@ -33,6 +48,15 @@ def model_training(model, training_set, validation_set,
 
 def model_evaluation(model, validation_set,
                      batch_size=512):
+    """
+        Method to evaluate model on validation dataset.
+        param:
+            model - Keras neural network model
+            validation_set - tuple sets for validation
+            batch_size - batch size for evaluation (512 as default)
+        return:
+            accuracy
+    """
     metrics = model.evaluate(x=validation_set[0],
                              y=validation_set[1],
                              batch_size=batch_size)
@@ -41,6 +65,12 @@ def model_evaluation(model, validation_set,
 
 
 def model_creation_and_compiling():
+    """
+        Method for neural network creation.
+        return:
+            model - Keras neural network model
+    """
+    # Sequential model using
     model = keras.Sequential()
 
     model.add(keras.layers.Dense(4096, input_dim=178,
@@ -55,6 +85,7 @@ def model_creation_and_compiling():
     model.add(keras.layers.Dense(16, activation='relu'))
     model.add(keras.layers.Dense(5, activation='softmax'))
 
+    # Model compiling
     model.compile(loss='categorical_crossentropy', optimizer='adam',
                   metrics=['accuracy'])
 
@@ -63,8 +94,17 @@ def model_creation_and_compiling():
 
 def neural_network_model(training_set, validation_set,
                          training=True):
+    """
+        Method for neural network using for classification.
+        param:
+            1. training_set - tuple of sets for training
+            2. validation_set - tuple of sets for validation
+            3. training - boolean value for training (True as default)
+    """
+    # Model creation
     model = model_creation_and_compiling()
 
+    # Training and validation sets without 'categories' column
     training_set = (training_set[0],
                     training_set[1].drop(columns=['categories'], axis=1))
     validation_set_temp = (validation_set[0],
@@ -72,9 +112,11 @@ def neural_network_model(training_set, validation_set,
                                                   axis=1))
 
     if training:
+        # Model training and evaluation
         model = model_training(model, training_set, validation_set_temp)
         model_evaluation(model, validation_set_temp)
     else:
+        # Weights loading and model evaluation
         model.load_weights("output_data/multivariate_analysis/initial/"
                            "neural_network/weights/weights.h5")
         model_evaluation(model, validation_set_temp)

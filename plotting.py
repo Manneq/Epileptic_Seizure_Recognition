@@ -1,3 +1,6 @@
+"""
+    File 'plotting.py' has functions for plotting different data.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -5,6 +8,19 @@ import seaborn as sns
 
 def bar_plotting(data, labels, title,
                  width=1920, height=1080, dpi=96, font_size=22, color='b'):
+    """
+        Method to plot bar chart.
+        param:
+            1. data - pandas DataFrame of data that should be plotted
+            2. labels - vector of strings (2) that are
+                x label and y label of plot
+            3. title - string name of plot
+            4. width - int value of plot width in pixels (1920 as default)
+            5. height - int value of plot height in pixels (1080 as default)
+            6. dpi - int value of plot dpi (96 as default)
+            7. font_size - int value of text size on plot (22 as default)
+            8. color - string value of color name for plot ('b' as default)
+    """
     plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
     plt.rcParams.update({'font.size': font_size})
     plt.bar((np.arange(len(data))), data, align='center',
@@ -22,8 +38,19 @@ def bar_plotting(data, labels, title,
 
 def pie_plotting(data, title,
                  width=1920, height=1080, dpi=96, font_size=22):
+    """
+        Method to plot pie chart.
+        param:
+            1. data - pandas DataFrame of data that should be plotted
+            2. title - string name of plot
+            3. width - int value of plot width in pixels (1920 as default)
+            4. height - int value of plot height in pixels (1080 as default)
+            5. dpi - int value of plot dpi (96 as default)
+            6. font_size - int value of text size on plot (22 as default)
+    """
     explode = ()
 
+    # Explode for pie chart pieces
     for i in range(len(data)):
         explode += (0.1, )
 
@@ -43,6 +70,19 @@ def pie_plotting(data, title,
 def heatmap_plotting(data, title, folder,
                      width=1920, height=1080, dpi=96, font_size=22,
                      annotation=True):
+    """
+        Method to plot correlations between parameters.
+        param:
+            1. data - numpy array of correlations that should be plotted
+            2. title - string name of plot
+            3. folder - string name of folder
+            4. width - int value of plot width in pixels (1920 as default)
+            5. height - int value of plot height in pixels (1080 as default)
+            6. dpi - int value of plot dpi (96 as default)
+            7. font_size - int value of text size on plot (22 as default)
+            8. annotation - boolean value for using annotation
+                (True as default)
+    """
     plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
     plt.rcParams.update({'font.size': font_size})
     sns.heatmap(data, annot=annotation).set_title(title)
@@ -55,11 +95,26 @@ def heatmap_plotting(data, title, folder,
 
 def data_plotting(data, labels, title, folder,
                   width=1920, height=1080, dpi=96, font_size=22):
+    """
+        Method to plot reduced data.
+        param:
+            1. data - pandas DataFrame of data that should be plotted
+            2. labels - vector of strings (2) that are
+                x label and y label of plot
+            3. title - string name of plot
+            4. folder - string name of folder
+            5. width - int value of plot width in pixels (1920 as default)
+            6. height - int value of plot height in pixels (1080 as default)
+            7. dpi - int value of plot dpi (96 as default)
+            8. font_size - int value of text size on plot (22 as default)
+    """
+    # Color palette for points
     color_palette = ['r', 'g', 'b', 'c', 'm']
 
     plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
     plt.rcParams.update({'font.size': font_size})
 
+    # Points plotting with legend
     for category_number in np.unique(data['y'].values):
         data_selected = data[data['y'] == category_number]
 
@@ -81,6 +136,18 @@ def data_plotting(data, labels, title, folder,
 
 def histogram_plotting(data, labels, title,
                        width=1920, height=1080, dpi=96, font_size=22):
+    """
+        Method to plot histogram.
+        param:
+            1. data - numpy array of data that should be plotted
+            2. labels - vector of strings (2) that are
+                x label and y label of plot
+            3. title - string name of plot
+            4. width - int value of plot width in pixels (1920 as default)
+            5. height - int value of plot height in pixels (1080 as default)
+            6. dpi - int value of plot dpi (96 as default)
+            7. font_size - int value of text size on plot (22 as default)
+    """
     plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
     plt.rcParams.update({'font.size': font_size})
     plt.hist(data, bins=data.shape[0])
