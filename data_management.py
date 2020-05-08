@@ -124,4 +124,3 @@ def sets_creation(data):
 
     return (training_set_input, training_set_output), \
            (validation_set_input, validation_set_output)
-
