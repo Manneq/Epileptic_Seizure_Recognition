@@ -114,14 +114,12 @@ def sets_creation(data):
         return:
             2 tuples of sets for training and validation
     """
-    # Categories binarization
-    data = data_preprocessing(data)
-
     # Sets creation with 20% for validation
     training_set_input, validation_set_input, training_set_output, \
         validation_set_output = \
         sklearn.model_selection.train_test_split(data.iloc[:, 0:178],
-                                                 data.iloc[:, 178:184],
+                                                 data.iloc[:,
+                                                 178:data.shape[1]],
                                                  test_size=0.2)
 
     return (training_set_input, training_set_output), \

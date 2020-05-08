@@ -1,12 +1,14 @@
 """
     File 'plotting.py' has functions for plotting different data.
 """
+import sklearn.tree
+import graphviz
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-def bar_plotting(data, labels, title,
+def bar_plotting(data, labels, title, folder,
                  width=1920, height=1080, dpi=96, font_size=22, color='b'):
     """
         Method to plot bar chart.
@@ -15,11 +17,12 @@ def bar_plotting(data, labels, title,
             2. labels - vector of strings (2) that are
                 x label and y label of plot
             3. title - string name of plot
-            4. width - int value of plot width in pixels (1920 as default)
-            5. height - int value of plot height in pixels (1080 as default)
-            6. dpi - int value of plot dpi (96 as default)
-            7. font_size - int value of text size on plot (22 as default)
-            8. color - string value of color name for plot ('b' as default)
+            4. folder - string folder path
+            5. width - int value of plot width in pixels (1920 as default)
+            6. height - int value of plot height in pixels (1080 as default)
+            7. dpi - int value of plot dpi (96 as default)
+            8. font_size - int value of text size on plot (22 as default)
+            9. color - string value of color name for plot ('b' as default)
     """
     plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
     plt.rcParams.update({'font.size': font_size})
@@ -30,7 +33,7 @@ def bar_plotting(data, labels, title,
     plt.xticks(np.arange(len(data)), data.index)
     plt.title(title)
     plt.tight_layout()
-    plt.savefig("output_data/univariate_analysis/" + title + ".png", dpi=dpi)
+    plt.savefig("output_data/" + folder + "/" + title + ".png", dpi=dpi)
     plt.close()
 
     return
@@ -155,8 +158,27 @@ def histogram_plotting(data, labels, title,
     plt.ylabel(labels[1])
     plt.title(title)
     plt.tight_layout()
-    plt.savefig("output_data/multivariate_analysis/initial/" +
-                title + ".png", dpi=dpi)
+    plt.savefig("output_data/multivariate_analysis/initial/"
+                "standard_deviations/" + title + ".png", dpi=dpi)
     plt.close()
+
+    return
+
+
+def graph_exporting(data, feature_names, class_names):
+    """
+        Method to export decision tree as png.
+        param:
+            1. data - sklearn decision tree
+            2. feature_names - list of names of features
+            3. class_names - list of class names
+    """
+    sklearn.tree.export_graphviz(data,
+                                 out_file="output_data/multivariate_analysis/"
+                                          "initial/decision_tree/tree.dot",
+                                 feature_names=feature_names,
+                                 class_names=class_names,
+                                 rounded=True, proportion=False,
+                                 precision=2, filled=True, label='all')
 
     return

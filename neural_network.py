@@ -19,11 +19,12 @@ def model_training(model, training_set, validation_set,
             model - Keras neural network model
     """
     model.fit(x=training_set[0],
-              y=training_set[1],
+              y=training_set[1].drop(columns=['categories'], axis=1),
               batch_size=batch_size,
               epochs=epochs,
               validation_data=(validation_set[0],
-                               validation_set[1]),
+                               validation_set[1].drop(columns=['categories'],
+                                                      axis=1)),
               shuffle=True,
               callbacks=[keras.callbacks.TerminateOnNaN(),
                          keras.callbacks.EarlyStopping(
@@ -58,7 +59,8 @@ def model_evaluation(model, validation_set,
             accuracy
     """
     metrics = model.evaluate(x=validation_set[0],
-                             y=validation_set[1],
+                             y=validation_set[1].drop(columns=['categories'],
+                                                      axis=1),
                              batch_size=batch_size)
 
     return metrics[1]
@@ -104,21 +106,14 @@ def neural_network_model(training_set, validation_set,
     # Model creation
     model = model_creation_and_compiling()
 
-    # Training and validation sets without 'categories' column
-    training_set = (training_set[0],
-                    training_set[1].drop(columns=['categories'], axis=1))
-    validation_set_temp = (validation_set[0],
-                           validation_set[1].drop(columns=['categories'],
-                                                  axis=1))
-
     if training:
         # Model training and evaluation
-        model = model_training(model, training_set, validation_set_temp)
-        model_evaluation(model, validation_set_temp)
+        model = model_training(model, training_set, validation_set)
+        model_evaluation(model, validation_set)
     else:
         # Weights loading and model evaluation
         model.load_weights("output_data/multivariate_analysis/initial/"
                            "neural_network/weights/weights.h5")
-        model_evaluation(model, validation_set_temp)
+        model_evaluation(model, validation_set)
 
     return

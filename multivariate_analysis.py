@@ -1,7 +1,10 @@
 """
     File 'multivariate_analysis.py' used for multivariate analysis.
 """
+import pandas as pd
 import numpy as np
+import sklearn.metrics
+import sklearn.tree
 import data_management
 import plotting
 import neural_network
@@ -34,6 +37,53 @@ def standard_deviation_computing(data,
     return
 
 
+def classification_using_dt(training_set, validation_set):
+    """
+        Function to perform classification task using decision tree.
+        param:
+            1. training_set - tuple of sets for training
+            2. validation_set - tuple of sets for validation
+    """
+    # Decision tree model
+    decision_tree_model = \
+        sklearn.tree.DecisionTreeClassifier(criterion='entropy',
+                                            max_leaf_nodes=30).\
+        fit(training_set[0],
+            training_set[1].drop(columns=['categories'], axis=1).astype('int'))
+
+    accuracies = []
+    categories = validation_set[1]['categories'].unique().tolist()
+
+    # Accuracy for every category computing
+    for category in categories:
+        accuracies.append(
+            sklearn.metrics.accuracy_score(
+                validation_set[1].loc[
+                    validation_set[1]['categories'] == category].
+                drop(columns=['categories'], axis=1).astype('int'),
+                decision_tree_model.predict(validation_set[0].loc[
+                    validation_set[1]['categories'] == category])))
+
+    # Print accuracy distribution over categories
+    plotting.bar_plotting(pd.Series(accuracies, index=categories),
+                          ["Categories", "Accuracy"],
+                          "Decision tree classification results (" +
+                          str(sklearn.metrics.accuracy_score(
+                              validation_set[1].drop(
+                                  columns=['categories'],
+                                  axis=1).astype('int'),
+                              decision_tree_model.predict(validation_set[0])))
+                          + ")",
+                          "multivariate_analysis/initial/decision_tree")
+
+    # Decision tree plotting
+    plotting.graph_exporting(decision_tree_model,
+                             training_set[0].columns.tolist(),
+                             training_set[1]['y'].unique().astype('str'))
+
+    return
+
+
 def initial_data_analysis(data):
     """
         Method to analyse initial dataset.
@@ -55,8 +105,15 @@ def initial_data_analysis(data):
     # Standard deviations computing for normalized data
     standard_deviation_computing(data, data_type="Normalized")
 
-    # Training and validation sets creation
+    # Training and validation sets creation for decision tree
     training_set, validation_set = data_management.sets_creation(data)
+
+    # Decision tree for classification problem
+    classification_using_dt(training_set, validation_set)
+
+    # Training and validation sets creation for neural network
+    training_set, validation_set = \
+        data_management.sets_creation(data_management.data_preprocessing(data))
 
     # Neural network for classification problem
     neural_network.neural_network_model(training_set, validation_set)
