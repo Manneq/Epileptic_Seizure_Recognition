@@ -2,7 +2,6 @@
     File 'plotting.py' has functions for plotting different data.
 """
 import sklearn.tree
-import graphviz
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
