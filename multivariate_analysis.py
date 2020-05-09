@@ -64,7 +64,7 @@ def classification_using_dt(training_set, validation_set):
                 decision_tree_model.predict(validation_set[0].loc[
                     validation_set[1]['categories'] == category])))
 
-    # Print accuracy distribution over categories
+    # Accuracy distribution over categories plotting
     plotting.bar_plotting(pd.Series(accuracies, index=categories),
                           ["Categories", "Accuracy"],
                           "Decision tree classification results (" +

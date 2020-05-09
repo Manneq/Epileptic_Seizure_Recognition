@@ -1,6 +1,7 @@
 import data_management
 import univariate_analysis
 import multivariate_analysis
+import modeling
 
 
 """
@@ -17,10 +18,13 @@ def main():
 
     # Univariate analysis
     univariate_analysis.univariate_analysis_applying(
-        data[['categories']].groupby('categories').size())
+        data['categories'].groupby('categories').size())
 
     # Multivariate analysis
     multivariate_analysis.multivariate_analysis_applying(data)
+
+    # Multivariate modeling
+    modeling.forecasting_using_arima(data)
 
     return
 

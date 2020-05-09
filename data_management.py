@@ -124,3 +124,48 @@ def sets_creation(data):
 
     return (training_set_input, training_set_output), \
            (validation_set_input, validation_set_output)
+
+
+def time_series_conversion(data):
+    """
+        Method to convert data to univariate time series.
+        param:
+            data - pandas DataFrame of initial data
+        return:
+            data - pandas DataFrame of time series for patients
+    """
+    # Categories dropping
+    data = data.drop(columns=['y', 'categories'], axis=1)
+
+    indexes = data.index
+    time_data = np.empty((len(indexes), 2))
+
+    # Time chunks and patients codes extraction
+    for i in range(len(indexes)):
+        temp_time = indexes[i].split(".")
+
+        time_data[i, 0] = float(temp_time[0].replace('X', '')) - 1
+
+        if temp_time[len(temp_time) - 1][0] == 'V':
+            time_data[i, 1] = \
+                int(temp_time[len(temp_time) - 1].replace('V', '')) + 10000
+        else:
+            time_data[i, 1] = int(temp_time[len(temp_time) - 1])
+
+    data[['time', 'patients']] = pd.DataFrame(time_data, index=data.index)
+
+    time_series_data = np.empty((len(data) * 178, 3))
+
+    # Time series creation
+    for i in range(len(data.index)):
+        temp_data = data.iloc[i, :].values
+        offset = 178 * i
+
+        for j in range(len(temp_data) - 2):
+            time_series_data[j + offset, :] = \
+                [temp_data[179], temp_data[178] + j / 179, temp_data[j]]
+
+    data = pd.DataFrame(time_series_data,
+                        columns=['patients', 'time', 'brain_activity'])
+
+    return data

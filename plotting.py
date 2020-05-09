@@ -12,7 +12,7 @@ def bar_plotting(data, labels, title, folder,
     """
         Method to plot bar chart.
         param:
-            1. data - pandas DataFrame of data that should be plotted
+            1. data - pandas Series of data that should be plotted
             2. labels - vector of strings (2) that are
                 x label and y label of plot
             3. title - string name of plot
@@ -179,5 +179,35 @@ def graph_exporting(data, feature_names, class_names):
                                  class_names=class_names,
                                  rounded=True, proportion=False,
                                  precision=2, filled=True, label='all')
+
+    return
+
+
+def line_plotting(data, forecasted_data, labels, title,
+                  width=1920, height=1080, dpi=96, font_size=22):
+    """
+        Method to plot line chart of forecasting.
+        param:
+            1. data - pandas DataFrame of data
+            2. forcasted_data - pandas DataFrame of forecasted data
+            2. labels - tuple of string labels
+            2. title - string name of plot
+            3. width - int value of plot width in pixels (1920 as default)
+            4. height - int value of plot height in pixels (1080 as default)
+            5. dpi - int value of plot dpi (96 as default)
+            6. font_size - int value of text size on plot (22 as default)
+    """
+    plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
+    plt.rcParams.update({'font.size': font_size})
+    plt.plot(data.index, data.values, 'b-', label="Brain activity")
+    plt.plot(forecasted_data.index.tolist(), forecasted_data.values, 'r-',
+             label="Forecasted brain activity")
+    plt.xlabel(labels[0])
+    plt.ylabel(labels[1])
+    plt.title(title)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("output_data/modeling/forecasting/" + title + ".png", dpi=dpi)
+    plt.close()
 
     return
