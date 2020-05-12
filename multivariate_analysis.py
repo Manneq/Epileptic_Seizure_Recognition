@@ -65,7 +65,8 @@ def classification_using_dt(training_set, validation_set):
                     validation_set[1]['categories'] == category])))
 
     # Accuracy distribution over categories plotting
-    plotting.bar_plotting(pd.Series(accuracies, index=categories),
+    plotting.bar_plotting(pd.Series(accuracies, index=categories).
+                          sort_values(ascending=False),
                           ["Categories", "Accuracy"],
                           "Decision tree classification results (" +
                           str(sklearn.metrics.accuracy_score(
