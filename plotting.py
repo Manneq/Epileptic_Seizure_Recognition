@@ -200,7 +200,7 @@ def line_plotting(data, labels, title, folder,
             8. forcasted_data - pandas DataFrame of forecasted data
                 (None as default)
             9. distribution - boolean value for chart type selection
-                (False as default
+                (False as default)
     """
     plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
     plt.rcParams.update({'font.size': font_size})
