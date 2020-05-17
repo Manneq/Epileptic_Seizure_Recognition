@@ -1,6 +1,7 @@
 """
     File 'plotting.py' has functions for plotting different data.
 """
+import pandas as pd
 import sklearn.tree
 import numpy as np
 import matplotlib.pyplot as plt
@@ -183,31 +184,46 @@ def graph_exporting(data, feature_names, class_names):
     return
 
 
-def line_plotting(data, forecasted_data, labels, title,
-                  width=1920, height=1080, dpi=96, font_size=22):
+def line_plotting(data, labels, title, folder,
+                  width=1920, height=1080, dpi=96, font_size=22,
+                  forecasted_data=None, distribution=False):
     """
-        Method to plot line chart of forecasting.
+        Method to plot line chart of forecasting and distributions.
         param:
             1. data - pandas DataFrame of data
-            2. forcasted_data - pandas DataFrame of forecasted data
             2. labels - tuple of string labels
-            2. title - string name of plot
-            3. width - int value of plot width in pixels (1920 as default)
-            4. height - int value of plot height in pixels (1080 as default)
-            5. dpi - int value of plot dpi (96 as default)
-            6. font_size - int value of text size on plot (22 as default)
+            3. title - string name of plot
+            4. width - int value of plot width in pixels (1920 as default)
+            5. height - int value of plot height in pixels (1080 as default)
+            6. dpi - int value of plot dpi (96 as default)
+            7. font_size - int value of text size on plot (22 as default)
+            8. forcasted_data - pandas DataFrame of forecasted data
+                (None as default)
+            9. distribution - boolean value for chart type selection
+                (False as default)
     """
     plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
     plt.rcParams.update({'font.size': font_size})
-    plt.plot(data.index, data.values, 'b-', label="Brain activity")
-    plt.plot(forecasted_data.index.tolist(), forecasted_data.values, 'r-',
-             label="Forecasted brain activity")
+
+    if distribution:
+        # Mean distribution plotting
+        plt.plot(data.index, data.values, 'b-')
+        plt.xticks(np.arange(len(data)), data.index, rotation=90)
+    else:
+        # Forecasting plotting
+        plt.plot(data.index, data.values, 'b-', label="Brain activity")
+
+        if isinstance(forecasted_data, pd.DataFrame):
+            plt.plot(forecasted_data.index.tolist(), forecasted_data.values,
+                     'r-', label="Forecasted brain activity")
+
+        plt.legend()
+
     plt.xlabel(labels[0])
     plt.ylabel(labels[1])
     plt.title(title)
-    plt.legend()
     plt.tight_layout()
-    plt.savefig("output_data/modeling/forecasting/" + title + ".png", dpi=dpi)
+    plt.savefig("output_data/" + folder + "/" + title + ".png", dpi=dpi)
     plt.close()
 
     return

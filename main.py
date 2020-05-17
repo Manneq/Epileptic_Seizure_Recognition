@@ -24,7 +24,7 @@ def main():
     multivariate_analysis.multivariate_analysis_applying(data)
 
     # Multivariate modeling
-    modeling.forecasting_using_arima(data)
+    modeling.modeling_applying(data)
 
     return
 

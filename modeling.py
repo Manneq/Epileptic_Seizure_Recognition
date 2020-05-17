@@ -1,5 +1,6 @@
 """
-    File 'modeling.py' used for forecasting.
+    File 'modeling.py' used for forecasting and finding brain activity
+        distributions over categories.
 """
 import pandas as pd
 import statsmodels.tsa.arima_model
@@ -36,9 +37,34 @@ def forecasting_using_arima(data):
                          columns=['brain_activity'], index=forecast_time)
 
         # Time series plotting
-        plotting.line_plotting(patient_data, forecasted_patient_data,
+        plotting.line_plotting(patient_data,
                                ["Time, s", "Brain activity"],
-                               "Brain activity of patient " + str(patient))
+                               "Brain of patient " + str(patient),
+                               "modeling/forecasting",
+                               forecasted_data=forecasted_patient_data)
+
+    return
+
+
+def distribution_thesis(data):
+    """
+        Method to plot mean distribution for categories.
+        param:
+            data - pandas DataFrame of initial data
+    """
+    for category in data['categories'].unique().tolist():
+        # Distributions computing
+        mean_distribution = \
+            data.loc[data['categories'] == category].\
+            drop(columns=['y', 'categories'], axis=1).mean(axis=0)
+
+        # Distribution plotting
+        plotting.line_plotting(mean_distribution,
+                               ["Brain activity", "Mean"],
+                               "Distribution for " + category,
+                               "modeling/distributions",
+                               font_size=8,
+                               distribution=True)
 
     return
 
@@ -49,6 +75,9 @@ def modeling_applying(data):
         param:
             data - pandas DataFrame of initial data.
     """
+    # Make a thesis about brain activities mean distributions
+    distribution_thesis(data)
+
     # Data forecasting using ARIMA
     forecasting_using_arima(data)
 
