@@ -4,6 +4,7 @@
 """
 import pandas as pd
 import statsmodels.tsa.arima_model
+import pomegranate
 import numpy as np
 import data_management
 import plotting
@@ -69,6 +70,25 @@ def distribution_thesis(data):
     return
 
 
+def bayesian_network_analysis(data):
+    """
+        Method to compute Bayesian Network.
+        param:
+            data - pandas DataFrame of reduced data
+    """
+    # Distribution of parameters plotting
+    for parameter in range(2):
+        plotting.histogram_plotting(data.iloc[:, parameter].values,
+                                    ["Values", "Number"],
+                                    "X" + str(parameter + 1) + " distribution",
+                                    "modeling/bayesian_network")
+
+    markov_chain_model = pomegranate.BayesianNetwork().\
+        from_samples(data.iloc[:, 0:2].values)
+
+    return
+
+
 def modeling_applying(data):
     """
         Method to apply modeling.
@@ -80,5 +100,9 @@ def modeling_applying(data):
 
     # Data forecasting using ARIMA
     forecasting_using_arima(data)
+
+    # Baysian network analysis on reducted data by PCA
+    bayesian_network_analysis(
+        data_management.dimensionality_reduction(data, reduction_type="PCA"))
 
     return

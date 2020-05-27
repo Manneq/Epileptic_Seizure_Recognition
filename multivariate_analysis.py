@@ -22,7 +22,9 @@ def standard_deviation_computing(data,
     # Standard deviations plotting
     plotting.histogram_plotting(np.std(data, axis=0),
                                 ["Parameters", "Standard deviation"],
-                                data_type + " data standard deviations")
+                                data_type + " data standard deviations",
+                                "multivariate_analysis/initial/"
+                                "standard_deviations")
 
     # Standard deviations for categories plotting
     for category in np.unique(data[['categories']].values):
@@ -32,7 +34,10 @@ def standard_deviation_computing(data,
                                     ["Parameters", "Standard deviation"],
                                     data_type +
                                     " data standard deviations (" +
-                                    category + ")")
+                                    category + ")",
+                                    "multivariate_analysis/initial/"
+                                    "standard_deviations"
+                                    )
 
     return
 

@@ -137,7 +137,7 @@ def data_plotting(data, labels, title, folder,
     return
 
 
-def histogram_plotting(data, labels, title,
+def histogram_plotting(data, labels, title, folder,
                        width=1920, height=1080, dpi=96, font_size=22):
     """
         Method to plot histogram.
@@ -146,20 +146,20 @@ def histogram_plotting(data, labels, title,
             2. labels - vector of strings (2) that are
                 x label and y label of plot
             3. title - string name of plot
-            4. width - int value of plot width in pixels (1920 as default)
-            5. height - int value of plot height in pixels (1080 as default)
-            6. dpi - int value of plot dpi (96 as default)
-            7. font_size - int value of text size on plot (22 as default)
+            4. folder - string name of folder
+            5. width - int value of plot width in pixels (1920 as default)
+            6. height - int value of plot height in pixels (1080 as default)
+            7. dpi - int value of plot dpi (96 as default)
+            8. font_size - int value of text size on plot (22 as default)
     """
     plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
     plt.rcParams.update({'font.size': font_size})
-    plt.hist(data, bins=data.shape[0])
+    plt.hist(data, bins=int(np.sqrt(data.shape[0])))
     plt.xlabel(labels[0])
     plt.ylabel(labels[1])
     plt.title(title)
     plt.tight_layout()
-    plt.savefig("output_data/multivariate_analysis/initial/"
-                "standard_deviations/" + title + ".png", dpi=dpi)
+    plt.savefig("output_data/" + folder + "/" + title + ".png", dpi=dpi)
     plt.close()
 
     return
