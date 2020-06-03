@@ -22,15 +22,14 @@ def forecasting_using_arima(data):
     # Time for forecasting
     forecast_time = np.arange(23, 24, 1 / 179)
 
-    # Forcast brain activity of first 2 patients
+    # Forecast brain activity of first 2 patients
     for patient in data['patients'].unique().tolist()[:2]:
         patient_data = data.loc[data['patients'] == patient].\
             drop(columns=['patients'], axis=1).set_index('time').sort_index()
 
         # ARIMA model creation and training
-        arima_model = \
-            statsmodels.tsa.arima_model.ARIMA(patient_data.values.tolist(),
-                                              order=(25, 1, 0)).fit(disp=0)
+        arima_model = statsmodels.tsa.arima_model.ARIMA(
+            patient_data.values.tolist(), order=(25, 1, 0)).fit(disp=0)
 
         # Brain activity forecasting
         forecasted_patient_data = \
@@ -40,7 +39,7 @@ def forecasting_using_arima(data):
         # Time series plotting
         plotting.line_plotting(patient_data,
                                ["Time, s", "Brain activity"],
-                               "Brain of patient " + str(patient),
+                               "Brain activity of patient " + str(patient),
                                "modeling/forecasting",
                                forecasted_data=forecasted_patient_data)
 

@@ -123,7 +123,6 @@ def initial_data_analysis(data):
             data - pandas DataFrame of initial data
     """
     # Correlations plotting
-    """
     plotting.heatmap_plotting(data.iloc[:, 0:178].corr(),
                               "Brain activity correlations",
                               "initial", width=3000, height=3000,
@@ -131,7 +130,6 @@ def initial_data_analysis(data):
 
     # Standard deviations computing
     standard_deviation_computing(data)
-    """
 
     # Data normalization
     data = data_management.data_normalization(data)
@@ -145,14 +143,12 @@ def initial_data_analysis(data):
     # Decision tree for classification problem
     classification_using_dt(training_set, validation_set)
 
-    """
     # Training and validation sets creation for neural network
     training_set, validation_set = \
         data_management.sets_creation(data_management.data_preprocessing(data))
 
     # Neural network for classification problem
     neural_network.neural_network_model(training_set, validation_set)
-    """
 
     return
 

@@ -23,7 +23,7 @@ def main():
     # Multivariate analysis
     multivariate_analysis.multivariate_analysis_applying(data)
 
-    # Multivariate modeling
+    # Modeling and forecasting
     modeling.modeling_applying(data)
 
     return
