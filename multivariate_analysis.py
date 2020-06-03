@@ -56,7 +56,7 @@ def classification_using_dt(training_set, validation_set):
         fit(training_set[0],
             training_set[1].drop(columns=['categories'], axis=1).astype('int'))
 
-    accuracies = []
+    accuracies, recalls, precisions = [], [], []
     categories = validation_set[1]['categories'].unique().tolist()
 
     # Accuracy for every category computing
@@ -69,17 +69,43 @@ def classification_using_dt(training_set, validation_set):
                 decision_tree_model.predict(validation_set[0].loc[
                     validation_set[1]['categories'] == category])))
 
+        recalls.append(
+            sklearn.metrics.recall_score(
+                validation_set[1].loc[
+                    validation_set[1]['categories'] == category].
+                drop(columns=['categories'], axis=1).astype('int'),
+                decision_tree_model.predict(validation_set[0].loc[
+                    validation_set[1]['categories'] == category]),
+                average='macro'))
+
+        precisions.append(
+            sklearn.metrics.precision_score(
+                validation_set[1].loc[
+                    validation_set[1]['categories'] == category].
+                drop(columns=['categories'], axis=1).astype('int'),
+                decision_tree_model.predict(validation_set[0].loc[
+                    validation_set[1]['categories'] == category]),
+                average='macro'))
+
     # Accuracy distribution over categories plotting
     plotting.bar_plotting(pd.Series(accuracies, index=categories).
                           sort_values(ascending=False),
                           ["Categories", "Accuracy"],
-                          "Decision tree classification results (" +
-                          str(sklearn.metrics.accuracy_score(
-                              validation_set[1].drop(
-                                  columns=['categories'],
-                                  axis=1).astype('int'),
-                              decision_tree_model.predict(validation_set[0])))
-                          + ")",
+                          "Decision tree classification results (Accuracy)",
+                          "multivariate_analysis/initial/decision_tree")
+
+    # Recall distribution over categories plotting
+    plotting.bar_plotting(pd.Series(recalls, index=categories).
+                          sort_values(ascending=False),
+                          ["Categories", "Recall"],
+                          "Decision tree classification results (Recall)",
+                          "multivariate_analysis/initial/decision_tree")
+
+    # Precision distribution over categories plotting
+    plotting.bar_plotting(pd.Series(precisions, index=categories).
+                          sort_values(ascending=False),
+                          ["Categories", "Precision"],
+                          "Decision tree classification results (Precision)",
                           "multivariate_analysis/initial/decision_tree")
 
     # Decision tree plotting
@@ -97,6 +123,7 @@ def initial_data_analysis(data):
             data - pandas DataFrame of initial data
     """
     # Correlations plotting
+    """
     plotting.heatmap_plotting(data.iloc[:, 0:178].corr(),
                               "Brain activity correlations",
                               "initial", width=3000, height=3000,
@@ -104,6 +131,7 @@ def initial_data_analysis(data):
 
     # Standard deviations computing
     standard_deviation_computing(data)
+    """
 
     # Data normalization
     data = data_management.data_normalization(data)
@@ -117,12 +145,14 @@ def initial_data_analysis(data):
     # Decision tree for classification problem
     classification_using_dt(training_set, validation_set)
 
+    """
     # Training and validation sets creation for neural network
     training_set, validation_set = \
         data_management.sets_creation(data_management.data_preprocessing(data))
 
     # Neural network for classification problem
     neural_network.neural_network_model(training_set, validation_set)
+    """
 
     return
 

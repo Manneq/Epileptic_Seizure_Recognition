@@ -22,7 +22,7 @@ def forecasting_using_arima(data):
     # Time for forecasting
     forecast_time = np.arange(23, 24, 1 / 179)
 
-    # Forcast bbrain activity of first 2 patients
+    # Forcast brain activity of first 2 patients
     for patient in data['patients'].unique().tolist()[:2]:
         patient_data = data.loc[data['patients'] == patient].\
             drop(columns=['patients'], axis=1).set_index('time').sort_index()
