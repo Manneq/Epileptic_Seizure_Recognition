@@ -11,8 +11,8 @@ def model_training(model, training_set, validation_set,
         Method for neural network training.
         param:
             1. model - Keras neural network model
-            2. training_set - tuple of sets for training
-            3. validation_set - tuple of sets for validation
+            2. training_set - list of sets for training
+            3. validation_set - list of sets for validation
             4. batch_size - batch size for training (512 as default)
             5. epochs - number of epochs (100 as default)
         return:
@@ -53,7 +53,7 @@ def model_evaluation(model, validation_set,
         Method to evaluate model on validation dataset.
         param:
             model - Keras neural network model
-            validation_set - tuple sets for validation
+            validation_set - list of sets for validation
             batch_size - batch size for evaluation (512 as default)
         return:
             accuracy
@@ -99,8 +99,8 @@ def neural_network_model(training_set, validation_set,
     """
         Method for neural network using for classification.
         param:
-            1. training_set - tuple of sets for training
-            2. validation_set - tuple of sets for validation
+            1. training_set - list of sets for training
+            2. validation_set - list of sets for validation
             3. training - boolean value for training (True as default)
     """
     # Model creation

@@ -112,7 +112,7 @@ def sets_creation(data):
         param:
             data - pandas DataFrame of normalized data
         return:
-            2 tuples of sets for training and validation
+            2 lists of sets for training and validation
     """
     # Sets creation with 20% for validation
     training_set_input, validation_set_input, training_set_output, \
@@ -122,8 +122,71 @@ def sets_creation(data):
                                                  178:data.shape[1]],
                                                  test_size=0.2)
 
-    return (training_set_input, training_set_output), \
-           (validation_set_input, validation_set_output)
+    return [training_set_input, training_set_output], \
+           [validation_set_input, validation_set_output]
+
+
+def sets_conversion(training_set, validation_set):
+    """
+        Training and validation sets conversion into seizure and
+            not seizure sets.
+        param:
+            1. training_set - list of sets for training
+            2. validation_set - list of sets for validation
+        return:
+            1. seizure_training_set - list of sets for training seizure
+                classification
+            2. seizure_validation_set - list of sets for seizure
+                classification validation
+            3. not_seizure_training_set - list of sets for training not seizure
+                classification
+            4. not_seizure_validation_set - list of sets for not seizure
+                classification validation
+    """
+    # Training and validation sets for seizure classification creation
+    seizure_training_set = \
+        [pd.DataFrame(training_set[0].values, index=training_set[0].index,
+                      columns=training_set[0].columns),
+         pd.DataFrame(training_set[1].values, index=training_set[1].index,
+                      columns=training_set[1].columns)]
+    seizure_validation_set = \
+        [pd.DataFrame(validation_set[0].values, index=validation_set[0].index,
+                      columns=validation_set[0].columns),
+         pd.DataFrame(validation_set[1].values, index=validation_set[1].index,
+                      columns=validation_set[1].columns)]
+
+    seizure_training_set[1].loc[seizure_training_set[1]['y'] != 0,
+                                ['y', 'categories']] = 1, 'Not seizure'
+    seizure_validation_set[1].loc[seizure_validation_set[1]['y'] != 0,
+                                  ['y', 'categories']] = 1, 'Not seizure'
+
+    # Training and validation sets for not seizure classification creation
+    not_seizure_training_set = pd.merge(training_set[0],
+                                        training_set[1],
+                                        left_index=True, right_index=True)
+    not_seizure_validation_set = pd.merge(validation_set[0],
+                                          validation_set[1],
+                                          left_index=True, right_index=True)
+
+    not_seizure_training_set = \
+        not_seizure_training_set.loc[not_seizure_training_set['y'] != 0]
+    not_seizure_validation_set = \
+        not_seizure_validation_set.loc[not_seizure_validation_set['y'] != 0]
+
+    not_seizure_training_set.loc[not_seizure_training_set['y'] != 0,
+                                 ['y']] -= 1
+    not_seizure_validation_set.loc[not_seizure_validation_set['y'] != 0,
+                                   ['y']] -= 1
+
+    not_seizure_training_set = [not_seizure_training_set.iloc[:, 0:178],
+                                not_seizure_training_set.iloc[:,
+                                178:not_seizure_training_set.shape[1]]]
+    not_seizure_validation_set = [not_seizure_validation_set.iloc[:, 0:178],
+                                  not_seizure_validation_set.iloc[:,
+                                  178:not_seizure_validation_set.shape[1]]]
+
+    return seizure_training_set, seizure_validation_set, \
+        not_seizure_training_set, not_seizure_validation_set
 
 
 def time_series_conversion(data):

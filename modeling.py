@@ -3,11 +3,15 @@
         distributions over categories.
 """
 import pandas as pd
-import statsmodels.tsa.arima_model
+import statsmodels.tsa.statespace.sarimax
+import statsmodels.api
+import statsmodels.tsa.stattools
 import pomegranate
 import numpy as np
 import data_management
 import plotting
+import itertools
+import matplotlib.pyplot as plt
 
 
 def forecasting_using_arima(data):
@@ -20,7 +24,7 @@ def forecasting_using_arima(data):
     data = data_management.time_series_conversion(data)
 
     # Time for forecasting
-    forecast_time = np.arange(23, 24, 1 / 179)
+    forecast_time = np.arange(23, 25, 1 / 179)
 
     # Forecast brain activity of first 2 patients
     for patient in data['patients'].unique().tolist()[:2]:
@@ -28,12 +32,17 @@ def forecasting_using_arima(data):
             drop(columns=['patients'], axis=1).set_index('time').sort_index()
 
         # ARIMA model creation and training
-        arima_model = statsmodels.tsa.arima_model.ARIMA(
-            patient_data.values.tolist(), order=(25, 1, 0)).fit(disp=0)
+        sarimax_model = statsmodels.tsa.statespace.sarimax.SARIMAX(
+            patient_data.values.tolist(),
+            order=(4, 1, 0),
+            seasonal_order=(1, 1, 1, 12),
+            enforce_stationarity=False,
+            enforce_invertibility=False).fit()
 
         # Brain activity forecasting
         forecasted_patient_data = \
-            pd.DataFrame(arima_model.forecast(steps=forecast_time.shape[0])[0], 
+            pd.DataFrame(sarimax_model.forecast(
+                steps=forecast_time.shape[0])[0],
                          columns=['brain_activity'], index=forecast_time)
 
         # Time series plotting
@@ -69,25 +78,6 @@ def distribution_thesis(data):
     return
 
 
-def bayesian_network_analysis(data):
-    """
-        Method to compute Bayesian Network.
-        param:
-            data - pandas DataFrame of reduced data
-    """
-    # Distribution of parameters plotting
-    for parameter in range(2):
-        plotting.histogram_plotting(data.iloc[:, parameter].values,
-                                    ["Values", "Number"],
-                                    "X" + str(parameter + 1) + " distribution",
-                                    "modeling/bayesian_network")
-
-    markov_chain_model = pomegranate.BayesianNetwork().\
-        from_samples(data.iloc[:, 0:2].values)
-
-    return
-
-
 def modeling_applying(data):
     """
         Method to apply modeling.
@@ -99,9 +89,5 @@ def modeling_applying(data):
 
     # Data forecasting using ARIMA
     forecasting_using_arima(data)
-
-    # Baysian network analysis on reducted data by PCA
-    bayesian_network_analysis(
-        data_management.dimensionality_reduction(data, reduction_type="PCA"))
 
     return

@@ -4,7 +4,7 @@
 import pandas as pd
 import numpy as np
 import sklearn.metrics
-import sklearn.tree
+import sklearn.ensemble
 import data_management
 import plotting
 import neural_network
@@ -36,82 +36,170 @@ def standard_deviation_computing(data,
                                     " data standard deviations (" +
                                     category + ")",
                                     "multivariate_analysis/initial/"
-                                    "standard_deviations"
-                                    )
+                                    "standard_deviations")
 
     return
 
 
-def classification_using_dt(training_set, validation_set):
+def random_forrest_classification(training_set, validation_set, folder,
+                                  feature_importance=True):
     """
-        Function to perform classification task using decision tree.
+        Training and validation of random forrest classifier model.
         param:
-            1. training_set - tuple of sets for training
-            2. validation_set - tuple of sets for validation
+            1. training_set - list of sets for training
+            2. validation_set - list of sets for validation
+            3. folder - string name of folder
+            4. feature_importance - boolean value to compute most important
+                features (True as default)
+        return:
+            most_important_features - list of 15 most important features
     """
-    # Decision tree model
-    decision_tree_model = \
-        sklearn.tree.DecisionTreeClassifier(criterion='entropy',
-                                            max_leaf_nodes=30).\
+    # Creation and training of random forest model
+    model_random_forest = \
+        sklearn.ensemble.RandomForestClassifier(n_estimators=2500,
+                                                max_features=None,
+                                                n_jobs=-1,
+                                                random_state=0).\
         fit(training_set[0],
-            training_set[1].drop(columns=['categories'], axis=1).astype('int'))
+            training_set[1].drop(columns=['categories'], axis=1).
+            astype('int').values.ravel())
 
-    accuracies, recalls, precisions = [], [], []
-    categories = validation_set[1]['categories'].unique().tolist()
+    categories = validation_set[1].loc[:, ['y', 'categories']].\
+        sort_values(by=['y']).drop(columns=['y'])['categories'].unique()
 
-    # Accuracy for every category computing
-    for category in categories:
-        accuracies.append(
-            sklearn.metrics.accuracy_score(
-                validation_set[1].loc[
-                    validation_set[1]['categories'] == category].
-                drop(columns=['categories'], axis=1).astype('int'),
-                decision_tree_model.predict(validation_set[0].loc[
-                    validation_set[1]['categories'] == category])))
+    # Accuracy computation for every category
+    confusion_matrix = sklearn.metrics.confusion_matrix(
+        validation_set[1].drop(columns=['categories'], axis=1).astype('int'),
+        model_random_forest.predict(validation_set[0]),
+        labels=np.arange(0, len(categories)))
 
-        recalls.append(
-            sklearn.metrics.recall_score(
-                validation_set[1].loc[
-                    validation_set[1]['categories'] == category].
-                drop(columns=['categories'], axis=1).astype('int'),
-                decision_tree_model.predict(validation_set[0].loc[
-                    validation_set[1]['categories'] == category]),
-                average='macro'))
+    accuracies = (confusion_matrix.astype('float') /
+                  confusion_matrix.sum(axis=1)[:, np.newaxis]).diagonal()
 
-        precisions.append(
-            sklearn.metrics.precision_score(
-                validation_set[1].loc[
-                    validation_set[1]['categories'] == category].
-                drop(columns=['categories'], axis=1).astype('int'),
-                decision_tree_model.predict(validation_set[0].loc[
-                    validation_set[1]['categories'] == category]),
-                average='macro'))
+    # Precision, recall and F-score computation for every category
+    precisions, recalls, f_scores, _ = \
+        sklearn.metrics.precision_recall_fscore_support(
+            validation_set[1].drop(columns=['categories'], axis=1).
+            astype('int'),
+            model_random_forest.predict(validation_set[0]),
+            labels=np.arange(0, len(categories)))
 
     # Accuracy distribution over categories plotting
     plotting.bar_plotting(pd.Series(accuracies, index=categories).
                           sort_values(ascending=False),
                           ["Categories", "Accuracy"],
-                          "Decision tree classification results (Accuracy)",
-                          "multivariate_analysis/initial/decision_tree")
+                          "Classification accuracy",
+                          "multivariate_analysis/initial/random_forest/" +
+                          folder)
 
     # Recall distribution over categories plotting
     plotting.bar_plotting(pd.Series(recalls, index=categories).
                           sort_values(ascending=False),
                           ["Categories", "Recall"],
-                          "Decision tree classification results (Recall)",
-                          "multivariate_analysis/initial/decision_tree")
+                          "Classification recall",
+                          "multivariate_analysis/initial/random_forest/" +
+                          folder)
 
     # Precision distribution over categories plotting
     plotting.bar_plotting(pd.Series(precisions, index=categories).
                           sort_values(ascending=False),
                           ["Categories", "Precision"],
-                          "Decision tree classification results (Precision)",
-                          "multivariate_analysis/initial/decision_tree")
+                          "Classification precision",
+                          "multivariate_analysis/initial/random_forest/" +
+                          folder)
+
+    # F-score distribution over categories plotting
+    plotting.bar_plotting(pd.Series(f_scores, index=categories).
+                          sort_values(ascending=False),
+                          ["Categories", "F-score"],
+                          "Classification F-score",
+                          "multivariate_analysis/initial/random_forest/" +
+                          folder)
 
     # Decision tree plotting
-    plotting.graph_exporting(decision_tree_model,
-                             training_set[0].columns.tolist(),
-                             training_set[1]['y'].unique().astype('str'))
+    plotting.graph_exporting(model_random_forest,
+                             validation_set[0].columns.tolist(),
+                             validation_set[1]['y'].unique().astype('str'),
+                             folder)
+
+    most_important_features = None
+
+    # Most important features selection and plotting
+    if feature_importance:
+        most_important_features = \
+            pd.Series(model_random_forest.feature_importances_,
+                      index=validation_set[0].columns).\
+            sort_values(ascending=False).head(15)
+
+        plotting.bar_plotting(most_important_features,
+                              ["Brain activity", "Score"],
+                              "Top 15 most important features",
+                              "multivariate_analysis/initial/random_forest/" +
+                              folder)
+
+    return most_important_features
+
+
+def classification_task(training_set, validation_set):
+    """
+        Function to perform classification task using random forest
+            with different approaches.
+        param:
+            1. training_set - list of sets for training
+            2. validation_set - list of sets for validation
+    """
+    # Random forest model on training and validation sets
+    most_important_features = \
+        random_forrest_classification(training_set, validation_set, "full")
+
+    # Random forest model on training and validation sets with only 15
+    # most important features
+    random_forrest_classification([training_set[0].loc[:,
+                                   most_important_features.index],
+                                   training_set[1]],
+                                  [validation_set[0].loc[:,
+                                   most_important_features.index],
+                                   validation_set[1]],
+                                  "full_featured", feature_importance=False)
+
+    # Sets conversion for seizure and seizure classification
+    training_set_seizure, validation_set_seizure, \
+        training_set_not_seizure, validation_set_not_seizure = \
+        data_management.sets_conversion(training_set, validation_set)
+
+    # Random forest model on training and validation sets for seizure
+    # classification
+    most_important_features = \
+        random_forrest_classification(training_set_seizure,
+                                      validation_set_seizure, "seizure")
+
+    # Random forest model on training and validation sets with only 15
+    # most important features for seizure classification
+    random_forrest_classification([training_set_seizure[0].loc[:,
+                                   most_important_features.index],
+                                   training_set_seizure[1]],
+                                  [validation_set_seizure[0].loc[:,
+                                   most_important_features.index],
+                                   validation_set_seizure[1]],
+                                  "seizure_featured", feature_importance=False)
+
+    # Random forest model on training and validation sets for not seizure
+    # classification
+    most_important_features = \
+        random_forrest_classification(training_set_not_seizure,
+                                      validation_set_not_seizure,
+                                      "not_seizure")
+
+    # Random forest model on training and validation sets with only 15
+    # most important features for not seizure classification
+    random_forrest_classification([training_set_not_seizure[0].loc[:,
+                                   most_important_features.index],
+                                   training_set_not_seizure[1]],
+                                  [validation_set_not_seizure[0].loc[:,
+                                   most_important_features.index],
+                                   validation_set_not_seizure[1]],
+                                  "not_seizure_featured",
+                                  feature_importance=False)
 
     return
 
@@ -140,8 +228,8 @@ def initial_data_analysis(data):
     # Training and validation sets creation for decision tree
     training_set, validation_set = data_management.sets_creation(data)
 
-    # Decision tree for classification problem
-    classification_using_dt(training_set, validation_set)
+    # Random forest for classification problem
+    classification_task(training_set, validation_set)
 
     # Training and validation sets creation for neural network
     training_set, validation_set = \

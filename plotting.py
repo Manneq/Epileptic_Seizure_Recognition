@@ -6,6 +6,7 @@ import sklearn.tree
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
 
 def bar_plotting(data, labels, title, folder,
@@ -165,21 +166,34 @@ def histogram_plotting(data, labels, title, folder,
     return
 
 
-def graph_exporting(data, feature_names, class_names):
+def graph_exporting(data, feature_names, class_names, folder):
     """
-        Method to export decision tree as png.
+        Method to export decision tree example.
         param:
-            1. data - sklearn decision tree
+            1. data - fitted sklearn random forest
             2. feature_names - list of names of features
             3. class_names - list of class names
+            4. folder - string name of folder
     """
-    sklearn.tree.export_graphviz(data,
+    sklearn.tree.export_graphviz(data.estimators_[0],
                                  out_file="output_data/multivariate_analysis/"
-                                          "initial/decision_tree/tree.dot",
+                                          "initial/random_forest/" +
+                                          folder + "/tree_example.dot",
                                  feature_names=feature_names,
                                  class_names=class_names,
                                  rounded=True, proportion=False,
                                  precision=2, filled=True, label='all')
+
+    # To png exporting
+    os.system("dot -Tpng output_data/multivariate_analysis/initial/"
+              "random_forest/" + folder + "/tree_example.dot -o output_data/"
+                                          "multivariate_analysis/initial/"
+                                          "random_forest/" + folder +
+              "/tree_example.png")
+
+    # dot file deleting
+    os.remove("output_data/multivariate_analysis/initial/random_forest/" +
+              folder + "/tree_example.dot")
 
     return
 
