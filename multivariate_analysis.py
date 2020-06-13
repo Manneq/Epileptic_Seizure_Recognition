@@ -2,9 +2,9 @@
     File 'multivariate_analysis.py' used for multivariate analysis.
 """
 import pandas as pd
-import numpy as np
 import sklearn.metrics
 import sklearn.ensemble
+import numpy as np
 import data_management
 import plotting
 import neural_network

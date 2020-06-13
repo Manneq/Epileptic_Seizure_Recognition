@@ -138,8 +138,8 @@ def sets_conversion(training_set, validation_set):
                 classification
             2. seizure_validation_set - list of sets for seizure
                 classification validation
-            3. not_seizure_training_set - list of sets for training not seizure
-                classification
+            3. not_seizure_training_set - list of sets for training not
+                seizure classification
             4. not_seizure_validation_set - list of sets for not seizure
                 classification validation
     """

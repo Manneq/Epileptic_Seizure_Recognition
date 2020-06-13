@@ -6,12 +6,9 @@ import pandas as pd
 import statsmodels.tsa.statespace.sarimax
 import statsmodels.api
 import statsmodels.tsa.stattools
-import pomegranate
 import numpy as np
 import data_management
 import plotting
-import itertools
-import matplotlib.pyplot as plt
 
 
 def forecasting_using_arima(data):
